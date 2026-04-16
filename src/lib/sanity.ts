@@ -8,7 +8,8 @@ export const client = createClient({
 });
 
 // Queries GROQ para o blog
-export const postsQuery = `*[_type == "post"] | order(publishedAt desc) {
+// Apenas posts publicados (não drafts), ordenados por data decrescente
+export const postsQuery = `*[_type == "post" && !(_id in path("drafts.**"))] | order(publishedAt desc) {
   _id,
   title,
   slug,

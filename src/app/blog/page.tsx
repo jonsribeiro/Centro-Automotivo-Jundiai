@@ -31,11 +31,25 @@ export const metadata: Metadata = {
 };
 
 async function getPosts() {
-  return client.fetch(postsQuery);
+  try {
+    const posts = await client.fetch(postsQuery);
+    console.log("Posts fetched:", posts?.length || 0, "posts");
+    return posts || [];
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return [];
+  }
 }
 
 async function getCategories() {
-  return client.fetch(categoriesQuery);
+  try {
+    const categories = await client.fetch(categoriesQuery);
+    console.log("Categories fetched:", categories?.length || 0, "categories");
+    return categories || [];
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
 }
 
 export default async function BlogPage() {
@@ -44,10 +58,15 @@ export default async function BlogPage() {
     getCategories(),
   ]);
 
+  // Debug: log dados
+  console.log("Total posts:", posts.length);
+  console.log("Total categories:", categories.length);
+
   // Ordenar posts por data (mais recentes primeiro)
   const sortedPosts = posts.sort(
     (a: any, b: any) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      new Date(b.publishedAt || 0).getTime() -
+      new Date(a.publishedAt || 0).getTime()
   );
 
   // Posts em destaque (os 3 mais recentes)
@@ -69,9 +88,9 @@ export default async function BlogPage() {
               Blog Automotivo
             </h1>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Dicas práticas, soluções para problemas comuns e informações sobre manutenção 
-              do seu veículo em Jundiaí. Conteúdo criado pelos especialistas do{" "}
-              {businessConfig.name}.
+              Dicas práticas, soluções para problemas comuns e informações sobre
+              manutenção do seu veículo em Jundiaí. Conteúdo criado pelos
+              especialistas do {businessConfig.name}.
             </p>
           </div>
         </div>
@@ -91,7 +110,7 @@ export default async function BlogPage() {
               {categories.map((category: any) => (
                 <Link
                   key={category._id}
-                  href={`/blog/categoria/${category.slug.current}/`}
+                  href={`/blog/categoria/${category.slug?.current || ""}/`}
                   className="bg-red-100 text-red-700 px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-80 transition-opacity"
                 >
                   {category.title}
@@ -114,7 +133,7 @@ export default async function BlogPage() {
               {featuredPosts.map((post: any, index: number) => (
                 <Link
                   key={post._id}
-                  href={`/blog/${post.slug.current}/`}
+                  href={`/blog/${post.slug?.current || ""}/`}
                   className={`group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col ${
                     index === 0 ? "md:col-span-2 md:row-span-2" : ""
                   }`}
@@ -126,7 +145,7 @@ export default async function BlogPage() {
                   >
                     <Image
                       src={post.image || "/placeholder.jpg"}
-                      alt={post.title}
+                      alt={post.title || "Post"}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -204,21 +223,28 @@ export default async function BlogPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Todos os Artigos
+            {remainingPosts.length > 0
+              ? "Todos os Artigos"
+              : sortedPosts.length > 0
+                ? ""
+                : "Artigos"}
           </h2>
 
-          {remainingPosts.length > 0 ? (
+          {sortedPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {remainingPosts.map((post: any) => (
+              {(remainingPosts.length > 0
+                ? remainingPosts
+                : sortedPosts
+              ).map((post: any) => (
                 <Link
                   key={post._id}
-                  href={`/blog/${post.slug.current}/`}
+                  href={`/blog/${post.slug?.current || ""}/`}
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
                 >
                   <div className="relative h-48 overflow-hidden">
                     <Image
                       src={post.image || "/placeholder.jpg"}
-                      alt={post.title}
+                      alt={post.title || "Post"}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -267,10 +293,21 @@ export default async function BlogPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <p className="text-gray-500">
-                Nenhum artigo adicional disponível.
+            <div className="text-center py-16 bg-gray-50 rounded-2xl">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Nenhum artigo publicado ainda
+              </h3>
+              <p className="text-gray-500 max-w-md mx-auto mb-6">
+                Em breve teremos conteúdo novo por aqui. Volte em alguns dias
+                para conferir!
               </p>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors"
+              >
+                Voltar para Home
+              </Link>
             </div>
           )}
         </div>
@@ -283,7 +320,7 @@ export default async function BlogPage() {
             Precisa de ajuda com seu carro?
           </h2>
           <p className="text-white/85 text-lg mb-8 max-w-xl mx-auto">
-            Nossos especialistas estão prontos para atender você em Jundiaí. 
+            Nossos especialistas estão prontos para atender você em Jundiaí.
             Atendimento imediato, sem agendamento.
           </p>
           <CTAButton
