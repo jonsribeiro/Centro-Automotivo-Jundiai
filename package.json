@@ -6,11 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sanity:populate": "tsx scripts/populate-sanity/index.ts",
+    "sanity:populate:dry": "tsx scripts/populate-sanity/index.ts --dry-run"
   },
   "dependencies": {
     "@portabletext/react": "^6.0.3",
-    "@sanity/client": "^6.21.0",
     "@sanity/vision": "^3.57.0",
     "next": "14.2.5",
     "next-sanity": "^9.5.0",
@@ -19,12 +20,15 @@
     "sanity": "^3.57.0"
   },
   "devDependencies": {
+    "@sanity/client": "^7.21.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.19",
+    "dotenv": "^17.4.2",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
