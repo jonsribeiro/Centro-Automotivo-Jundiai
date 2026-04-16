@@ -245,6 +245,35 @@ export const services = [
       },
     ],
   },
+  {
+    id: "escapamento",
+    slug: "escapamento-jundiai",
+    title: "Escapamento",
+    description: "Conserto e troca de escapamento em Jundiaí. Silencioso, catalisador, sonda lambda e mais.",
+    shortDescription: "Conserto de barulho e vazamentos",
+    price: "a partir de R$ 80",
+    duration: "30 min - 2 horas",
+    icon: "Wind",
+    keywords: ["escapamento Jundiaí", "conserto escapamento", "catalisador", "barulho escapamento", "vazamento escapamento"],
+    features: [
+      "Soldagem de furos e rachaduras",
+      "Troca de silencioso",
+      "Substituição de catalisador",
+      "Troca de sonda lambda",
+      "Diagnóstico de barulhos",
+      "Garantia em todos os serviços",
+    ],
+    faq: [
+      {
+        question: "Por que meu escapamento está fazendo barulho?",
+        answer: "Pode ser furo no cano, silencioso danificado ou junta queimada. Fazemos diagnóstico gratuito.",
+      },
+      {
+        question: "É perigoso dirigir com escapamento vazando?",
+        answer: "Sim! Pode liberar gases tóxicos para dentro do carro. Procure uma oficina imediatamente.",
+      },
+    ],
+  },
 ];
 
 // Bairros atendidos
