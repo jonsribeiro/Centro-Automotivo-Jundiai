@@ -50,6 +50,7 @@ export const posts: PostContent[] = [
       "Descubra o momento certo para trocar o óleo do seu carro em Jundiaí. Preços, tipos de óleo e onde fazer. Atendimento rápido na Vila Arens.",
     excerpt:
       "Saiba exatamente quando trocar o óleo do seu carro, quanto custa em Jundiaí e por que a troca regular é essencial para a saúde do motor.",
+    mainImage: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80",
     author: "Centro Automotivo Jundiaí",
     publishedAt: new Date().toISOString(),
     category: "manutencao",
@@ -136,6 +137,7 @@ export const posts: PostContent[] = [
       "Aprenda a identificar os sinais de desgaste nos freios do seu carro. Barulho, vibração, pedal baixo? Saiba quando procurar um mecânico em Jundiaí.",
     excerpt:
       "Barulho ao frear, pedal baixo ou vibração no volante? Descubra os sinais de alerta que indicam problemas nos freios e como evitar acidentes.",
+    mainImage: "https://images.unsplash.com/photo-1625047509168-a7026f36de04?w=800&q=80",
     author: "Centro Automotivo Jundiaí",
     publishedAt: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
     category: "problemas-comuns",
@@ -213,6 +215,7 @@ export const posts: PostContent[] = [
       "Descubra por que sua suspensão está fazendo barulho. Batidas, rangidos e soluções. Mecânico especializado em Jundiaí, Vila Arens.",
     excerpt:
       "Barulhos na suspensão podem indicar problemas graves. Conheça as causas mais comuns, os riscos de ignorar e onde consertar em Jundiaí.",
+    mainImage: "https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&q=80",
     author: "Centro Automotivo Jundiaí",
     publishedAt: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
     category: "problemas-comuns",
@@ -293,6 +296,7 @@ export const posts: PostContent[] = [
       "Saiba quando fazer alinhamento e balanceamento. Sinais de desalinhamento, importância para os pneus e segurança. Oficina em Jundiaí, Vila Arens.",
     excerpt:
       "Carro puxando para o lado? Volante torto? Descubra quando fazer alinhamento e balanceamento e por que isso economiza seus pneus.",
+    mainImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
     author: "Centro Automotivo Jundiaí",
     publishedAt: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
     category: "manutencao",
@@ -393,6 +397,7 @@ export const posts: PostContent[] = [
       "Descubra como a revisão preventiva pode economizar dinheiro. Check-up completo, diagnóstico e manutenção. Oficina mecânica em Jundiaí.",
     excerpt:
       "Prevenir é melhor que remediar. Saiba como uma revisão preventiva simples pode evitar gastos de milhares de reais com seu carro.",
+    mainImage: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=80",
     author: "Centro Automotivo Jundiaí",
     publishedAt: new Date(Date.now() - 345600000).toISOString(), // 4 dias atrás
     category: "manutencao",
