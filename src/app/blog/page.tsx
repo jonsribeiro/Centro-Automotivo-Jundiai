@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  blogPosts,
-  blogCategories,
-  type BlogCategory,
-} from "@/lib/blog";
+import { client, postsQuery, categoriesQuery } from "@/lib/sanity";
 import { businessConfig } from "@/lib/config";
 import { CTAButton } from "@/components/WhatsAppButton";
 
@@ -34,10 +30,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
+async function getPosts() {
+  return client.fetch(postsQuery);
+}
+
+async function getCategories() {
+  return client.fetch(categoriesQuery);
+}
+
+export default async function BlogPage() {
+  const [posts, categories] = await Promise.all([
+    getPosts(),
+    getCategories(),
+  ]);
+
   // Ordenar posts por data (mais recentes primeiro)
-  const sortedPosts = [...blogPosts].sort(
-    (a, b) =>
+  const sortedPosts = posts.sort(
+    (a: any, b: any) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   );
 
@@ -61,7 +70,7 @@ export default function BlogPage() {
             </h1>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Dicas práticas, soluções para problemas comuns e informações sobre manutenção 
-              do seu veículo em Jundiaí. Conteúdo criado pelos especialistas do 
+              do seu veículo em Jundiaí. Conteúdo criado pelos especialistas do{" "}
               {businessConfig.name}.
             </p>
           </div>
@@ -69,27 +78,29 @@ export default function BlogPage() {
       </section>
 
       {/* Categorias */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/blog/"
-              className="bg-gray-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
-            >
-              Todos
-            </Link>
-            {Object.entries(blogCategories).map(([key, category]) => (
+      {categories.length > 0 && (
+        <section className="py-12 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-wrap gap-3 justify-center">
               <Link
-                key={key}
-                href={`/blog/categoria/${key}/`}
-                className={`${category.color} px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-80 transition-opacity`}
+                href="/blog/"
+                className="bg-gray-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
               >
-                {category.label}
+                Todos
               </Link>
-            ))}
+              {categories.map((category: any) => (
+                <Link
+                  key={category._id}
+                  href={`/blog/categoria/${category.slug.current}/`}
+                  className="bg-red-100 text-red-700 px-5 py-2.5 rounded-full text-sm font-medium hover:opacity-80 transition-opacity"
+                >
+                  {category.title}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Posts em Destaque */}
       {featuredPosts.length > 0 && (
@@ -100,10 +111,10 @@ export default function BlogPage() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredPosts.map((post, index) => (
+              {featuredPosts.map((post: any, index: number) => (
                 <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}/`}
+                  key={post._id}
+                  href={`/blog/${post.slug.current}/`}
                   className={`group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col ${
                     index === 0 ? "md:col-span-2 md:row-span-2" : ""
                   }`}
@@ -114,34 +125,42 @@ export default function BlogPage() {
                     }`}
                   >
                     <Image
-                      src={post.image}
+                      src={post.image || "/placeholder.jpg"}
                       alt={post.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span
-                        className={`${
-                          blogCategories[post.category].color
-                        } px-3 py-1 rounded-full text-xs font-semibold`}
-                      >
-                        {post.categoryLabel}
-                      </span>
-                    </div>
+                    {post.category && (
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold"
+                        >
+                          {post.category.title}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
                       <span>
-                        {new Date(post.publishedAt).toLocaleDateString("pt-BR", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
+                        {post.publishedAt
+                          ? new Date(post.publishedAt).toLocaleDateString(
+                              "pt-BR",
+                              {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )
+                          : "Data não disponível"}
                       </span>
-                      <span>•</span>
-                      <span>{post.readTime} de leitura</span>
+                      {post.readTime && (
+                        <>
+                          <span>•</span>
+                          <span>{post.readTime} de leitura</span>
+                        </>
+                      )}
                     </div>
 
                     <h3
@@ -188,56 +207,72 @@ export default function BlogPage() {
             Todos os Artigos
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {remainingPosts.map((post) => (
-              <Link
-                key={post.slug}
-                href={`/blog/${post.slug}/`}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span
-                      className={`${
-                        blogCategories[post.category].color
-                      } px-3 py-1 rounded-full text-xs font-semibold`}
-                    >
-                      {post.categoryLabel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                    <span>
-                      {new Date(post.publishedAt).toLocaleDateString("pt-BR", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                    <span>•</span>
-                    <span>{post.readTime}</span>
+          {remainingPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {remainingPosts.map((post: any) => (
+                <Link
+                  key={post._id}
+                  href={`/blog/${post.slug.current}/`}
+                  className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={post.image || "/placeholder.jpg"}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {post.category && (
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold"
+                        >
+                          {post.category.title}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  <h3 className="font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                      <span>
+                        {post.publishedAt
+                          ? new Date(post.publishedAt).toLocaleDateString(
+                              "pt-BR",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )
+                          : "Data não disponível"}
+                      </span>
+                      {post.readTime && (
+                        <>
+                          <span>•</span>
+                          <span>{post.readTime}</span>
+                        </>
+                      )}
+                    </div>
 
-                  <p className="text-gray-500 text-sm line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+                    <h3 className="font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+
+                    <p className="text-gray-500 text-sm line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-gray-500">
+                Nenhum artigo adicional disponível.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
